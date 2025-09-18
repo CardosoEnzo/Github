@@ -1,0 +1,142 @@
+table '8-Termo Aditivo'
+	lineageTag: e65dca53-6ef7-463b-bc39-3ff92a495b81
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: c344d9d5-3390-4fce-92e9-b84bb5aa260b
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_TERMO
+		dataType: string
+		lineageTag: f346db59-68d3-4601-9f81-520431d99ba3
+		summarizeBy: none
+		sourceColumn: ID_TERMO
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_CONTRATO
+		dataType: string
+		lineageTag: 3bb32a42-07fe-4dcf-9cfe-64e62ada22c7
+		summarizeBy: none
+		sourceColumn: ID_CONTRATO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Nº TERMO'
+		dataType: string
+		lineageTag: 83bfcd8a-b73b-4feb-97a3-23a233bbb4a9
+		summarizeBy: none
+		sourceColumn: Nº TERMO
+
+		annotation SummarizationSetBy = Automatic
+
+	column OBJETO/DESCRIÇÃO
+		dataType: string
+		lineageTag: 6274ca96-acdf-40ea-8807-9d36b405347f
+		summarizeBy: none
+		sourceColumn: OBJETO/DESCRIÇÃO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'VALOR GLOBAL'
+		dataType: double
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: c5c94bb6-5851-41fa-90e8-622b76366b07
+		summarizeBy: sum
+		sourceColumn: VALOR GLOBAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	column 'SALDO RESÍDUAL'
+		dataType: double
+		lineageTag: 4ff65423-291c-4c8d-ad55-db4651dc3f10
+		summarizeBy: sum
+		sourceColumn: SALDO RESÍDUAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'VIGÊNCIA INICIAL'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 6ba8b77a-e93f-4ca8-8826-9a9eae4b57da
+		summarizeBy: none
+		sourceColumn: VIGÊNCIA INICIAL
+
+		variation Variation
+			isDefault
+			relationship: ece35e15-b3c5-4b50-83ac-2649e7087f9c
+			defaultHierarchy: LocalDateTable_ce35e1dc-2cbf-41f2-b57d-0a775ed5f045.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'VIGÊNCIA FINAL'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: d5ad497b-6e08-4524-a47b-44ec3e17ef2e
+		summarizeBy: none
+		sourceColumn: VIGÊNCIA FINAL
+
+		variation Variation
+			isDefault
+			relationship: 39eba3dd-1bb2-4151-bb49-31b40b6fd83e
+			defaultHierarchy: LocalDateTable_0e0f0173-d783-4b01-8ed9-33ca6ca9dda1.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column MESES_ADITIVO
+		dataType: int64
+		formatString: 0
+		lineageTag: 7ef012fd-30a0-44ed-a204-3df4061d679e
+		summarizeBy: sum
+		sourceColumn: MESES_ADITIVO
+
+		annotation SummarizationSetBy = Automatic
+
+	column STATUS_TERMO =
+			
+			IF(
+			    TODAY() > '8-Termo Aditivo'[VIGÊNCIA FINAL],
+			    "Inativo",
+			    "Ativo"
+			)
+		lineageTag: b9486944-73e6-4602-80be-e8e9076d076a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '8-Termo Aditivo' = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://prodeboffice365-my.sharepoint.com/personal/cti_saeb_ba_gov_br/Documents/CTI%20-%20Gest%C3%A3o%20de%20Contratos/CTI-%20Gest%C3%A3o%20de%20Contratos.xlsx"), null, true),
+				    #"8-Termo Aditivo_Sheet" = Fonte{[Item="8-Termo Aditivo",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"8-Termo Aditivo_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"CADASTRO DO TERMO ADITIVO", type any}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}, {"Column6", type any}, {"Column7", type any}, {"Column8", type any}, {"Column9", type any}, {"Column10", type any}}),
+				    #"Linhas Superiores Removidas" = Table.Skip(#"Tipo Alterado",2),
+				    #"Cabeçalhos Promovidos1" = Table.PromoteHeaders(#"Linhas Superiores Removidas", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos1",{{"ID", Int64.Type}, {"ID_TERMO", type text}, {"ID_CONTRATO", type text}, {"Nº TERMO", type text}, {"OBJETO/DESCRIÇÃO", type text}, {"VALOR GLOBAL", Int64.Type}, {"SALDO RESÍDUAL", Int64.Type}, {"VIGÊNCIA INICIAL", type date}, {"VIGÊNCIA FINAL", type date}, {"MESES_ADITIVO", Int64.Type}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado1", each ([ID_CONTRATO] = "DA-PRODEB-018/2024")),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Linhas Filtradas",{{"VALOR GLOBAL", type number}, {"SALDO RESÍDUAL", type number}})
+				in
+				    #"Tipo Alterado2"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

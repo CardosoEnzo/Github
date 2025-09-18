@@ -1,0 +1,47 @@
+table 3-Área
+	lineageTag: c3b956b2-5b0e-4ead-bafc-2547ed03a90b
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 0b18217b-147c-4556-bcc5-c3455f8bd409
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME
+		dataType: string
+		lineageTag: 0c71bf44-2b01-4020-a91b-558d6db1d6ff
+		summarizeBy: none
+		sourceColumn: NOME
+
+		annotation SummarizationSetBy = Automatic
+
+	column SIGLA
+		dataType: string
+		lineageTag: bd48d7d8-da51-4559-9b7b-42326ef0323b
+		summarizeBy: none
+		sourceColumn: SIGLA
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 3-Área = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://prodeboffice365-my.sharepoint.com/personal/cti_saeb_ba_gov_br/Documents/CTI%20-%20Gest%C3%A3o%20de%20Contratos/CTI-%20Gest%C3%A3o%20de%20Contratos.xlsx"), null, true),
+				    #"3-Área_Sheet" = Fonte{[Item="3-Área",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"3-Área_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"LISTA DA ÁREA DO GESTOR/FISCAL", type any}, {"Column2", type text}, {"Column3", type text}}),
+				    #"Linhas Superiores Removidas" = Table.Skip(#"Tipo Alterado",2),
+				    #"Cabeçalhos Promovidos1" = Table.PromoteHeaders(#"Linhas Superiores Removidas", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos1",{{"ID", Int64.Type}, {"NOME", type text}, {"SIGLA", type text}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado1", each ([SIGLA] <> null))
+				in
+				    #"Linhas Filtradas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

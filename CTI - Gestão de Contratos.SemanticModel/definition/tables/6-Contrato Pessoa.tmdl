@@ -1,0 +1,47 @@
+table '6-Contrato Pessoa'
+	lineageTag: 1bcc99b7-ba5a-43a7-83ce-a032842415bb
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 3c1bdaab-4ce9-47db-b139-ede1c4f6db81
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_CONTRATO-ADITIVO
+		dataType: string
+		lineageTag: cea05b9a-e110-4b08-823c-78dffd1ba9b7
+		summarizeBy: none
+		sourceColumn: ID_CONTRATO-ADITIVO
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME_PESSOA
+		dataType: string
+		lineageTag: df271e9e-a673-42ff-ab12-7b307050f817
+		summarizeBy: none
+		sourceColumn: NOME_PESSOA
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '6-Contrato Pessoa' = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://prodeboffice365-my.sharepoint.com/personal/cti_saeb_ba_gov_br/Documents/CTI%20-%20Gest%C3%A3o%20de%20Contratos/CTI-%20Gest%C3%A3o%20de%20Contratos.xlsx"), null, true),
+				    #"6-Contrato Pessoa_Sheet" = Fonte{[Item="6-Contrato Pessoa",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"6-Contrato Pessoa_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"CADASTRO FISCAL/GESTOR AO CONTRATO", type any}, {"Column2", type text}, {"Column3", type text}}),
+				    #"Linhas Superiores Removidas" = Table.Skip(#"Tipo Alterado",2),
+				    #"Cabeçalhos Promovidos1" = Table.PromoteHeaders(#"Linhas Superiores Removidas", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos1",{{"ID", Int64.Type}, {"ID_CONTRATO-ADITIVO", type text}, {"NOME_PESSOA", type text}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado1", each ([NOME_PESSOA] <> null))
+				in
+				    #"Linhas Filtradas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
