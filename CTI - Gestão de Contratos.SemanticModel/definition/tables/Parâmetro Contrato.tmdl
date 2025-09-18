@@ -1,0 +1,50 @@
+table 'Parâmetro Contrato'
+	lineageTag: ad05eea1-2554-42f0-8b25-2f487685a627
+
+	column 'Parâmetro Contrato'
+		lineageTag: 6546a0bf-6d25-46a5-a9a3-76e6a0cdd871
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Parâmetro Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'Parâmetro Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parâmetro Campos'
+		isHidden
+		lineageTag: ae63e5bf-e3dd-4338-9a09-31bff9bf41a9
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Parâmetro Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parâmetro Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: d8d2ee96-6559-429e-8b83-1f8f978db399
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parâmetro Contrato' = calculated
+		mode: import
+		source =
+				{
+				    ("Valor Estimado", NAMEOF('Medidas'[Soma_Valor_Estimado_Contrato]), 0),
+				    ("Valor Pago", NAMEOF('Medidas'[Valor_Mensal_Pago_Contrato]), 1),
+				    ("Saldo Mensal", NAMEOF('Medidas'[Soma_Saldo_Mensal_Contrato]), 2),
+				    ("Qtd de Pagamentos", NAMEOF('Medidas'[Pagamentos_Contrato]), 3)
+				}
+
+	annotation PBI_Id = 9df596c20be84a538f0ebbfc06584fe1
+

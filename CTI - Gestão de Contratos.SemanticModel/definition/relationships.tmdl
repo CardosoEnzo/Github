@@ -1,0 +1,76 @@
+relationship 11de3a56-124c-43d3-81d7-55fdf751625f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 5-Contrato.'VIGÊNCIA FINAL'
+	toColumn: LocalDateTable_87c4f705-9b64-4eeb-b0cb-b20f8f312e81.Date
+
+relationship ece35e15-b3c5-4b50-83ac-2649e7087f9c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: '8-Termo Aditivo'.'VIGÊNCIA INICIAL'
+	toColumn: LocalDateTable_ce35e1dc-2cbf-41f2-b57d-0a775ed5f045.Date
+
+relationship 39eba3dd-1bb2-4151-bb49-31b40b6fd83e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: '8-Termo Aditivo'.'VIGÊNCIA FINAL'
+	toColumn: LocalDateTable_0e0f0173-d783-4b01-8ed9-33ca6ca9dda1.Date
+
+relationship 379e4869-3f97-9082-13fc-2d9c3108ceff
+	fromColumn: 5-Contrato.'SIGLA UNIDADE GESTORA'
+	toColumn: 1-Unidade_Gestora.SIGLA
+
+relationship f835bae4-80e3-0e1c-262c-5ea2179b5dd1
+	fromColumn: '7-Execução Contrato'.ID_CONTRATO
+	toColumn: 5-Contrato.ID_AGRUPADO
+
+relationship 5d11214d-3a46-5bff-6313-ebcac4130b69
+	fromColumn: 4-Gestor-Fiscal.SIGLA_AREA
+	toColumn: 3-Área.SIGLA
+
+relationship 5182879a-7b26-5559-018b-585eb3e00415
+	fromColumn: '9-Execução do Aditivo'.ID_TERMO
+	toColumn: '8-Termo Aditivo'.ID_TERMO
+
+relationship 2072a1c6-7fe9-ed5d-bd3a-994176075d44
+	fromColumn: '6-Contrato Pessoa'.NOME_PESSOA
+	toColumn: 4-Gestor-Fiscal.NOME
+
+relationship b396ac35-afa3-245c-bf24-8f0fbdeee3dc
+	fromColumn: 5-Contrato.'SIGLA EMPRESA'
+	toColumn: 2-Empresa.SIGLA
+
+relationship 64c081d7-d0dd-7824-eaa7-f2ad3a80bef1
+	fromColumn: '6-Contrato Pessoa'.ID_CONTRATO-ADITIVO
+	toColumn: '8-Termo Aditivo'.ID_TERMO
+
+relationship 6793d54e-11bd-5243-e62f-ff3bb3d797bf
+	fromColumn: '8-Termo Aditivo'.ID_CONTRATO
+	toColumn: 5-Contrato.ID_AGRUPADO
+
+relationship eaa04a60-a941-4355-83bb-a313a9210b40
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 5-Contrato.'DATA FINAL ACUMULADA'
+	toColumn: LocalDateTable_865debb8-33f7-4781-82f0-5356a2b72a88.Date
+
+relationship 82afd00d-22a4-46ff-ae1e-8d22b3286423
+	joinOnDateBehavior: datePartOnly
+	fromColumn: '9-Execução do Aditivo'.MÊS/ANO
+	toColumn: LocalDateTable_6186f85c-fac0-4bad-88e1-395edc5f7e0e.Date
+
+relationship 2d22d434-a14a-44bc-aa6b-7129c79290a9
+	joinOnDateBehavior: datePartOnly
+	fromColumn: '7-Execução Contrato'.MÊS/ANO
+	toColumn: LocalDateTable_49cca51b-0bb7-4dc9-8b7a-b6d010bd77ac.Date
+
+relationship 8f34d84e-94fd-c66f-6563-9e74c1ba3bf3
+	fromColumn: '6-Contrato Pessoa'.ID_CONTRATO-ADITIVO
+	toColumn: '10-Contratos e Termos Aditivos'.Valor
+
+relationship 2a87e320-d28d-404e-b661-6ad38153e3bf
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Calendario.Date
+	toColumn: LocalDateTable_fce4d9d1-e36e-4f85-9b27-83d155a98fd3.Date
+
+relationship 5f9e16f7-c1bb-9172-964f-5bfbf62c2c83
+	crossFilteringBehavior: bothDirections
+	fromColumn: 5-Contrato.'VIGÊNCIA INICIAL'
+	toColumn: Calendario.Date
+

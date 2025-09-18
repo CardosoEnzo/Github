@@ -1,0 +1,27 @@
+table '10-Contratos e Termos Aditivos'
+	lineageTag: 2423e56f-3799-405b-888f-723011c3e2c0
+
+	column Valor
+		dataType: string
+		lineageTag: b4e9cf42-8937-4f07-9a76-6dc99535e70e
+		summarizeBy: none
+		sourceColumn: Valor
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '10-Contratos e Termos Aditivos' = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://prodeboffice365-my.sharepoint.com/personal/cti_saeb_ba_gov_br/Documents/CTI%20-%20Gest%C3%A3o%20de%20Contratos/CTI-%20Gest%C3%A3o%20de%20Contratos.xlsx"), null, true),
+				    #"10-Contratos e Termos Aditivos_Sheet" = Fonte{[Item="10-Contratos e Termos Aditivos",Kind="Sheet"]}[Data],
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"10-Contratos e Termos Aditivos_Sheet",{{"Column1", type text}}),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"Tipo Alterado", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Valor", type text}})
+				in
+				    #"Tipo Alterado1"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

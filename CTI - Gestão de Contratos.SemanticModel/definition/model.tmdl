@@ -1,0 +1,40 @@
+model Model
+	culture: pt-BR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: pt-BR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["1-Unidade_Gestora","2-Empresa","3-Área","4-Gestor-Fiscal","5-Contrato","6-Contrato Pessoa","7-Execução Contrato","8-Termo Aditivo","9-Execução do Aditivo","10-Contratos e Termos Aditivos","Tabela"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table 1-Unidade_Gestora
+ref table 2-Empresa
+ref table 3-Área
+ref table 4-Gestor-Fiscal
+ref table 5-Contrato
+ref table '6-Contrato Pessoa'
+ref table '7-Execução Contrato'
+ref table '8-Termo Aditivo'
+ref table '9-Execução do Aditivo'
+ref table '10-Contratos e Termos Aditivos'
+ref table DateTableTemplate_655d830e-ab0e-4952-ba9f-edb2360ea48a
+ref table LocalDateTable_87c4f705-9b64-4eeb-b0cb-b20f8f312e81
+ref table LocalDateTable_ce35e1dc-2cbf-41f2-b57d-0a775ed5f045
+ref table LocalDateTable_0e0f0173-d783-4b01-8ed9-33ca6ca9dda1
+ref table Medidas
+ref table LocalDateTable_865debb8-33f7-4781-82f0-5356a2b72a88
+ref table Calendario
+ref table LocalDateTable_6186f85c-fac0-4bad-88e1-395edc5f7e0e
+ref table LocalDateTable_49cca51b-0bb7-4dc9-8b7a-b6d010bd77ac
+ref table 'Parâmetro Contrato'
+ref table 'Parâmetro Aditivo'
+ref table Tabela
+ref table LocalDateTable_fce4d9d1-e36e-4f85-9b27-83d155a98fd3
+
+ref cultureInfo pt-BR
+

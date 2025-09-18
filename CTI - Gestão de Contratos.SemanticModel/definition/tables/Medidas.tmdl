@@ -1,0 +1,273 @@
+table Medidas
+	lineageTag: 244798e9-e153-4f4e-939d-b76f483ac971
+
+	measure Valor_Mensal_Pago_Global = CALCULATE(SUM('9-Execução do Aditivo'[VALOR MENSAL PAGO]) + SUM('7-Execução Contrato'[VALOR MENSAL PAGO]))
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: a7df87b8-5a76-4d31-80d6-425e913f160c
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure Valor_estático_0 =
+			
+			var zero = 0
+			return zero
+		formatString: 0
+		lineageTag: cdfef861-6a36-454b-9e41-8b081b11fa1f
+
+	measure Saldo_Residual_Acumulado = SUM('5-Contrato'[VALOR GLOBAL ACUMULADA]) - [Valor_Mensal_Pago_Global]
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 0b0338fb-a840-455e-9619-5bb9eef6ec35
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure Perc_Prazo_Prorrogado =
+			
+			var qtdIdAditivos = DISTINCTCOUNT('8-Termo Aditivo'[ID_CONTRATO])
+			var qtdContratos = DISTINCTCOUNT('5-Contrato'[ID_AGRUPADO])
+			
+			return qtdIdAditivos/qtdContratos
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 48c173d7-02c8-4af0-84e6-b294e909f8b0
+
+	measure Dotacao_Global = CALCULATE(SUM('5-Contrato'[DOTAÇÃO CONTRATUAL])+SUM('8-Termo Aditivo'[VALOR GLOBAL]))
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 1cbdf653-db06-4465-a793-791946ddc84d
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure Dias_Restantes =
+			
+			var diasFim = DATEDIFF(TODAY(), MAX('5-Contrato'[DATA FINAL ACUMULADA]), DAY)
+			
+			RETURN diasFim
+		formatString: 0
+		lineageTag: 841d8644-e18d-4bab-95b0-72e26caa7e5a
+
+	measure Return_Dias =
+			
+			var dias = " dias"
+			
+			RETURN dias
+		lineageTag: 5abf81c8-00d8-4429-9d0a-c2d30a58d7dd
+
+	measure Pagamentos_Aditivo =
+			
+			CALCULATE(
+			    COUNTROWS('9-Execução do Aditivo')
+			)
+		formatString: 0
+		lineageTag: 832ce385-0ba7-4b10-ae10-412a4e6838a4
+
+	measure Pagamentos_Realizados =
+			
+			[Pagamentos_Contrato] + [Pagamentos_Aditivo]
+		formatString: 0
+		lineageTag: 9d4e5c20-6d7a-4964-b48b-83e68f64cd8e
+
+	measure Pagamentos_Contrato =
+			
+			CALCULATE(
+			    COUNTROWS('7-Execução Contrato')
+			)
+		formatString: #,0
+		lineageTag: 26c34ad8-e856-46f2-9a6c-c4c38aa3beb0
+
+	measure Soma_Valor_Estimado_Contrato = CALCULATE(SUM('7-Execução Contrato'[VALOR ESTIMADO]))
+		formatString: #,0.00
+		lineageTag: 6e82047c-a97f-4845-8d8a-e615ace811fa
+
+	measure Soma_Valor_Mensal_Pago = CALCULATE(SUM('7-Execução Contrato'[VALOR MENSAL PAGO]),USERELATIONSHIP(Calendario[Date], '7-Execução Contrato'[MÊS/ANO]))
+		lineageTag: e6f4a55b-e1b4-4576-bcc1-2bf8cb476d47
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure %_Dotacao_Utilizada = DIVIDE([Valor_Mensal_Pago_Global],[Dotacao_Global],0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 496b4a5e-3b48-4263-9894-4970dc9423d0
+
+	measure Valor_Mensal_Pago_Aditivo = CALCULATE(SUM('9-Execução do Aditivo'[VALOR MENSAL PAGO]))+0
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 7b4bae20-e13c-4106-9d09-3633d92eccd0
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure Valor_Mensal_Pago_Contrato = SUM('7-Execução Contrato'[VALOR MENSAL PAGO])
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: f8f8cfcb-215f-4330-b015-b25fad852054
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure Saldo_Contratual = SUMX('5-Contrato', '5-Contrato'[DOTAÇÃO CONTRATUAL] - [Valor_Mensal_Pago_Contrato])
+		lineageTag: 0c9d09e6-2949-4e2a-a0d1-3af46bfcee99
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Saldo_Residual_Contrato = SUM('5-Contrato'[DOTAÇÃO CONTRATUAL]) - [Valor_Mensal_Pago_Contrato]
+		lineageTag: 6282338d-8c76-4d43-a1b0-c4f727189408
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure %_Restante_Dotacao = 1-[%_Dotacao_Utilizada]
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: d797daaf-8cf2-4e32-b016-924a9e49f35c
+
+	measure Saldo_Residual_Aditivos = SUM('8-Termo Aditivo'[VALOR GLOBAL]) - [Valor_Mensal_Pago_Aditivo]
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: eba65775-6944-4ee7-a678-cb0e486dfa70
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure '% Saldo Restante' = DIVIDE([Saldo_Residual_Acumulado], [Dotacao_Global],0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 762c9054-105c-44e0-b90e-533562e7a703
+
+	measure Valor_Medio_Pagamento = DIVIDE([Valor_Mensal_Pago_Global], CALCULATE(COUNTROWS('7-Execução Contrato') + COUNTROWS('9-Execução do Aditivo')))
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: f556dafe-8554-420a-bfa3-462748048849
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure %_Dotacao_Aditivos_Utilizada = DIVIDE([Valor_Mensal_Pago_Aditivo],SUM('8-Termo Aditivo'[VALOR GLOBAL]),0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 6a900f87-4528-432e-9f60-e7b28a3ce938
+
+	measure %_Restante_Dotacao_Aditivos = 1 - [%_Dotacao_Aditivos_Utilizada]
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 61d915ae-5447-4f48-91f2-1b7f5aa7197c
+
+	measure Aditivos_Inativos = CALCULATE(COUNTROWS('8-Termo Aditivo'), '8-Termo Aditivo'[STATUS_TERMO] = "Inativo")
+		formatString: 0
+		lineageTag: 881ddea6-5894-49af-8477-0fdcba5eb048
+
+	measure Aditivos_Ativos = CALCULATE(COUNTROWS('8-Termo Aditivo'), '8-Termo Aditivo'[STATUS_TERMO] = "Ativo")
+		formatString: 0
+		lineageTag: 04c4eecf-8b46-4c9a-9965-8824cd532d74
+
+	measure Dias_Restantes_Aditivos =
+			
+			var diasFim = DATEDIFF(TODAY(), MAX('8-Termo Aditivo'[VIGÊNCIA FINAL]), DAY)
+			
+			RETURN diasFim
+		formatString: 0
+		lineageTag: 02e9b33d-7ba5-462b-955f-52d9c7422838
+
+	measure Diferença_Dias_Aditivos = DATEDIFF(MAX('5-Contrato'[VIGÊNCIA INICIAL]), MAX('8-Termo Aditivo'[VIGÊNCIA FINAL]), MONTH)
+		formatString: 0
+		lineageTag: 8046fcab-498b-4fc6-aa1f-ca960551f743
+
+	measure Eixo_X_Dinamico_Dotacao_Global_Empresa =
+			
+			var valor = MAXX('2-Empresa',[Dotacao_Global])
+			
+			return 2.0 * valor
+		lineageTag: 62e9a311-b535-4a65-b5a5-5a5be69560a7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Eixo_X_Dinamico_Saldo_Residual =
+			
+			var valor = MAXX('2-Empresa',[Saldo_Residual_Acumulado])
+			
+			return 2.0 * valor
+		lineageTag: ed375342-e6b6-44e9-873e-05467331af5f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Eixo_X_Dinamico_Valor_Pago_Contrato =
+			
+			var valor = MAXX('7-Execução Contrato',[Valor_Mensal_Pago_Contrato])
+			
+			return 3.0 * valor
+		lineageTag: 85cc310e-ae00-4218-83dc-5b097e4773ea
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Eixo_X_Dinamico_Valor_Pago_Aditivo =
+			
+			var valor = MAXX('9-Execução do Aditivo',[Valor_Mensal_Pago_Aditivo])
+			
+			return 2.0 * valor
+		lineageTag: 9bb9dd08-ce44-4025-ae40-96488c11d539
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Soma_Saldo_Mensal_Contrato = CALCULATE(SUM('7-Execução Contrato'[SALDO MENSAL]))
+		formatString: #,0.00
+		lineageTag: a7c1a1c8-36a3-43fe-a811-aa3559310f6c
+
+	measure Soma_Saldo_Mensal_Aditivo = CALCULATE(SUM('9-Execução do Aditivo'[SALDO MENSAL]))
+		lineageTag: b823d62c-5565-4553-82a4-a2e58036999c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Soma_Valor_Estimado_Aditivo = CALCULATE(SUM('9-Execução do Aditivo'[VALOR ESTIMADO]))
+		lineageTag: 4bb0e331-c635-4a40-85a0-39a6321ad012
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Selecao_Gestor-Fiscal = ```
+			CALCULATE(SELECTEDVALUE('4-Gestor-Fiscal'[LINK_FOTO]), USERELATIONSHIP('6-Contrato Pessoa'[NOME_PESSOA], '4-Gestor-Fiscal'[NOME]))
+			
+			```
+		lineageTag: fd2c3ad6-71c1-47b4-85b3-467b91cda0f7
+
+	measure Teste_Gestor = ```
+			SELECTEDVALUE('6-Contrato Pessoa'[NOME_PESSOA], "Nenhum ou mais de um gestor")
+			
+			```
+		lineageTag: 49766e12-31a1-40a9-840b-d74e3b265c80
+
+	measure Eixo_X_Dinamico_Dias_Fim =
+			
+			var valor = MAXX('5-Contrato',[Dias_Restantes])
+			
+			return 2.0 * valor
+		lineageTag: 6ab29072-cc06-43bf-a5ed-f148a83776c4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Eixo_X_Dinamico_Parametro2 =
+			
+			var valor = MAXX('Parâmetro Aditivo', 'Parâmetro Aditivo'[Parâmetro Campos])
+			
+			return 1.5 * valor
+		lineageTag: f4793fb8-7aab-4e3e-bf51-b91a7b0f4ae7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Eixo_X_Dinamico_Dotacao_Global_Uni_Gestora =
+			
+			var valor = MAXX('1-Unidade_Gestora',[Dotacao_Global])
+			
+			return 1.5 * valor
+		lineageTag: aeaf2143-4512-4425-97db-181f968a7d3a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_Contratos_Ativos = CALCULATE(DISTINCTCOUNT('5-Contrato'[ID_AGRUPADO]), '5-Contrato'[STATUS_CONTRATO] = "Ativo")
+		formatString: 0
+		lineageTag: b48ab053-a6cc-40d5-a668-69d78cc7b5bd
+
+	measure Total_Contratos_Inativos = CALCULATE(DISTINCTCOUNT('5-Contrato'[ID_AGRUPADO]), '5-Contrato'[STATUS_CONTRATO] = "Inativo")
+		formatString: 0
+		lineageTag: c261dbb9-6c7a-4d9c-9f40-994233dc4349
+
+	column Column
+		formatString: 0
+		lineageTag: 00873912-c1e1-41be-a594-78b711643f3c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Medidas = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 6ced18a1223a46c9bb7763942918b3fd
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":null}
+
+	annotation 277cc1b9-af89-4597-8e15-cacc25c0886b = Para usar caracteres especiais em um nome de tabela calculado, feche o nome completo com colchetes ( [] ) e adicione ] a quaisquer colchetes de fechamento no nome.
+

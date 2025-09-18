@@ -1,0 +1,182 @@
+table 5-Contrato
+	lineageTag: fffe8585-22d1-431b-b638-a54f0a8e9f7b
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: ce554f47-8729-447d-883b-d2f31425b196
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_AGRUPADO
+		dataType: string
+		lineageTag: 9a0e4926-b589-4a0b-a265-94e31748c299
+		summarizeBy: none
+		sourceColumn: ID_AGRUPADO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Nº CONTRATO'
+		dataType: string
+		lineageTag: 8d8053a0-cde7-4a66-b24c-c296073d86a0
+		summarizeBy: none
+		sourceColumn: Nº CONTRATO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SIGLA EMPRESA'
+		dataType: string
+		lineageTag: 6feb8fae-180b-4a68-bc6d-e784c606f384
+		summarizeBy: none
+		sourceColumn: SIGLA EMPRESA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SIGLA UNIDADE GESTORA'
+		dataType: string
+		lineageTag: a2c0eaf4-24ef-4045-93cb-36faacbef5fb
+		summarizeBy: none
+		sourceColumn: SIGLA UNIDADE GESTORA
+
+		annotation SummarizationSetBy = Automatic
+
+	column OBJETO/DESCRIÇÃO
+		dataType: string
+		lineageTag: 0fdc0cff-0ce6-4d60-a1c9-6409c9a65543
+		summarizeBy: none
+		sourceColumn: OBJETO/DESCRIÇÃO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DOTAÇÃO CONTRATUAL'
+		dataType: double
+		lineageTag: 07e08aba-2626-4048-bf3d-7047f65c180e
+		summarizeBy: sum
+		sourceColumn: DOTAÇÃO CONTRATUAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'VALOR GLOBAL ACUMULADA'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: f354237e-8f7d-4528-8843-46fc1c9e1156
+		summarizeBy: sum
+		sourceColumn: VALOR GLOBAL ACUMULADA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SALDO CONTRATUAL'
+		dataType: double
+		lineageTag: 7824f718-1d39-45cf-8c31-264e0d1e5fdf
+		summarizeBy: sum
+		sourceColumn: SALDO CONTRATUAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'VIGÊNCIA INICIAL'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: e51286b9-1fa3-429b-9dd6-9a749e29b5dd
+		summarizeBy: none
+		sourceColumn: VIGÊNCIA INICIAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'VIGÊNCIA FINAL'
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: f5894f86-f52a-4df3-8a3e-cac8ca6ce71d
+		summarizeBy: none
+		sourceColumn: VIGÊNCIA FINAL
+
+		variation Variation
+			isDefault
+			relationship: 11de3a56-124c-43d3-81d7-55fdf751625f
+			defaultHierarchy: LocalDateTable_87c4f705-9b64-4eeb-b0cb-b20f8f312e81.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column MESES_CONTRATO
+		dataType: int64
+		formatString: 0
+		lineageTag: 58d535c7-85c7-440e-a5d7-71dd725d246b
+		summarizeBy: sum
+		sourceColumn: MESES_CONTRATO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DATA FINAL ACUMULADA' = ```
+			
+			VAR DataFimContrato = '5-Contrato'[VIGÊNCIA FINAL]
+			VAR UltimoTermo = 
+			    CALCULATE(
+			        MAX('8-Termo Aditivo'[VIGÊNCIA FINAL]),
+			        FILTER(
+			            '8-Termo Aditivo',
+			            '8-Termo Aditivo'[ID_CONTRATO] = '5-Contrato'[ID_AGRUPADO] &&
+			            '8-Termo Aditivo'[VIGÊNCIA FINAL] > DataFimContrato
+			        )
+			    )
+			RETURN
+			IF(NOT ISBLANK(UltimoTermo), UltimoTermo, DataFimContrato)
+			
+			```
+		formatString: dd/mm/yyyy
+		lineageTag: 379acf06-4818-46a9-a8d0-c518f92286c3
+		summarizeBy: none
+
+		variation Variation
+			isDefault
+			relationship: eaa04a60-a941-4355-83bb-a313a9210b40
+			defaultHierarchy: LocalDateTable_865debb8-33f7-4781-82f0-5356a2b72a88.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column STATUS_CONTRATO =
+			
+			IF(
+			    TODAY() > '5-Contrato'[DATA FINAL ACUMULADA],
+			    "Inativo",
+			    "Ativo"
+			)
+		lineageTag: 8e7af5d9-ace9-4236-b475-a1cc976c818a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 5-Contrato = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://prodeboffice365-my.sharepoint.com/personal/cti_saeb_ba_gov_br/Documents/CTI%20-%20Gest%C3%A3o%20de%20Contratos/CTI-%20Gest%C3%A3o%20de%20Contratos.xlsx"), null, true),
+				    #"5-Contrato_Sheet" = Fonte{[Item="5-Contrato",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"5-Contrato_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"CADASTRO DO CONTRATO", type any}, {"Column2", type text}, {"Column3", type any}, {"Column4", type text}, {"Column5", type text}, {"Column6", type text}, {"Column7", type any}, {"Column8", type any}, {"Column9", type any}, {"Column10", type any}, {"Column11", type any}, {"Column12", type any}}),
+				    #"Linhas Superiores Removidas" = Table.Skip(#"Tipo Alterado",2),
+				    #"Cabeçalhos Promovidos1" = Table.PromoteHeaders(#"Linhas Superiores Removidas", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos1",{{"ID", Int64.Type}, {"ID_AGRUPADO", type text}, {"Nº CONTRATO", type text}, {"SIGLA EMPRESA", type text}, {"SIGLA UNIDADE GESTORA", type text}, {"OBJETO/DESCRIÇÃO", type text}, {"DOTAÇÃO CONTRATUAL", type number}, {"VALOR GLOBAL ACUMULADA", type number}, {"SALDO CONTRATUAL", type number}, {"VIGÊNCIA INICIAL", type date}, {"VIGÊNCIA FINAL", type date}, {"MESES_CONTRATO", Int64.Type}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado1", each ([Nº CONTRATO] <> null)),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Linhas Filtradas",{{"DOTAÇÃO CONTRATUAL", type number}, {"VALOR GLOBAL ACUMULADA", type number}, {"SALDO CONTRATUAL", type number}})
+				in
+				    #"Tipo Alterado2"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

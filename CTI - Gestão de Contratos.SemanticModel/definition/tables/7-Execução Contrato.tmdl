@@ -1,0 +1,143 @@
+table '7-Execução Contrato'
+	lineageTag: 8cf20059-d20a-4df7-85cb-8c5535e05fe5
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 245df332-31f4-480a-9833-696d2f1d2335
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_CONTRATO
+		dataType: string
+		lineageTag: eeca7dee-2d7a-4754-8139-4eeb76408073
+		summarizeBy: none
+		sourceColumn: ID_CONTRATO
+
+		annotation SummarizationSetBy = Automatic
+
+	column MÊS/ANO
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 386073f6-cf4a-4661-8d77-fc7336431acf
+		summarizeBy: none
+		sourceColumn: MÊS/ANO
+
+		variation Variation
+			isDefault
+			relationship: 2d22d434-a14a-44bc-aa6b-7129c79290a9
+			defaultHierarchy: LocalDateTable_49cca51b-0bb7-4dc9-8b7a-b6d010bd77ac.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'Nº PROCESSO SEI'
+		dataType: string
+		lineageTag: 916a73c8-a1a3-445c-8dd8-9a4e987ffb66
+		summarizeBy: none
+		sourceColumn: Nº PROCESSO SEI
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'N° NOTA'
+		dataType: string
+		lineageTag: 6a013620-82db-4506-a359-1b2d785f5d61
+		summarizeBy: none
+		sourceColumn: N° NOTA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'VALOR ESTIMADO'
+		dataType: double
+		lineageTag: d33ff847-cb7c-4d7e-8397-01ab36aa9aba
+		summarizeBy: sum
+		sourceColumn: VALOR ESTIMADO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'VALOR MENSAL PAGO'
+		dataType: double
+		lineageTag: 91e9b7d3-d189-43c2-a28d-6a12cc192be5
+		summarizeBy: sum
+		sourceColumn: VALOR MENSAL PAGO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'SALDO MENSAL'
+		dataType: double
+		lineageTag: 8bd2493f-77b1-492e-9cf8-25cd779b124b
+		summarizeBy: sum
+		sourceColumn: SALDO MENSAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SITUAÇÃO
+		dataType: string
+		lineageTag: d898de2c-27f2-4521-b82d-56f8a11eb84d
+		summarizeBy: none
+		sourceColumn: SITUAÇÃO
+
+		annotation SummarizationSetBy = Automatic
+
+	column Observação
+		dataType: string
+		lineageTag: 00e3021d-d1aa-4242-8439-79d745aad0f9
+		summarizeBy: none
+		sourceColumn: Observação
+
+		annotation SummarizationSetBy = Automatic
+
+	column MÊS_ABREV = ```
+			FORMAT('7-Execução Contrato'[MÊS/ANO], "MMM")
+			
+			```
+		lineageTag: 793503e6-7b4c-4573-be89-a818fe5805f9
+		summarizeBy: none
+		sortByColumn: NUMERO_MÊS
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column NUMERO_MÊS = ```
+			MONTH('7-Execução Contrato'[MÊS/ANO])
+			
+			```
+		formatString: 0
+		lineageTag: 78bd0082-2453-4e53-aaef-ab2c0a6be479
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '7-Execução Contrato' = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://prodeboffice365-my.sharepoint.com/personal/cti_saeb_ba_gov_br/Documents/CTI%20-%20Gest%C3%A3o%20de%20Contratos/CTI-%20Gest%C3%A3o%20de%20Contratos.xlsx"), null, true),
+				    #"7-Execução Contrato_Sheet" = Fonte{[Item="7-Execução Contrato",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"7-Execução Contrato_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"EXECUTAR PAGAMENTOS (CONTRATO)", type any}, {"Column2", type text}, {"Column3", type any}, {"Column4", type text}, {"Column5", type any}, {"Column6", type any}, {"Column7", type any}, {"Column8", type any}, {"Column9", type text}, {"Column10", type text}, {"Column11", type any}, {"Column12", type any}, {"Column13", type any}, {"Column14", type any}, {"Column15", type any}, {"Column16", type any}, {"Column17", type any}}),
+				    #"Linhas Superiores Removidas" = Table.Skip(#"Tipo Alterado",2),
+				    #"Cabeçalhos Promovidos1" = Table.PromoteHeaders(#"Linhas Superiores Removidas", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos1",{{"ID", Int64.Type}, {"ID_CONTRATO", type text}, {"MÊS/ANO", type date}, {"Nº PROCESSO SEI", type text}, {"N° NOTA", Int64.Type}, {"VALOR ESTIMADO", type number}, {"VALOR MENSAL PAGO", type number}, {"SALDO MENSAL", type number}, {"SITUAÇÃO", type text}, {"Observação", type text}, {"Column11", type any}, {"Column12", type any}, {"Column13", type any}, {"Column14", type any}, {"Column15", type any}, {"Column16", type any}, {"Column17", type any}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado1", each ([ID_CONTRATO] <> null)),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Linhas Filtradas",{{"N° NOTA", type text}, {"VALOR ESTIMADO", type number}, {"VALOR MENSAL PAGO", type number}, {"SALDO MENSAL", type number}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado2",{"Column11", "Column12", "Column13", "Column14", "Column15", "Column16", "Column17"})
+				in
+				    #"Colunas Removidas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
