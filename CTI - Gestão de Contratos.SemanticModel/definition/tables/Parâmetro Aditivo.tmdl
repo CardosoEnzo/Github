@@ -1,0 +1,50 @@
+table 'Parâmetro Aditivo'
+	lineageTag: 30a93c36-14d9-48d9-8eeb-14209d3b0da6
+
+	column 'Parâmetro Aditivo'
+		lineageTag: afa1c4f7-ae1b-4edf-8b35-1d8063a9d920
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Parâmetro Pedido'
+
+		relatedColumnDetails
+			groupByColumn: 'Parâmetro Campos'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parâmetro Campos'
+		isHidden
+		lineageTag: ed413869-b184-4217-bc69-9c7998dd7de8
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Parâmetro Pedido'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parâmetro Pedido'
+		isHidden
+		formatString: 0
+		lineageTag: bc5ddfaf-6a70-47eb-8cd4-735b23f929c8
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Parâmetro Aditivo' = calculated
+		mode: import
+		source =
+				{
+				    ("Valor Estimado", NAMEOF('Medidas'[Soma_Valor_Estimado_Aditivo]), 0),
+				    ("Valor Pago", NAMEOF('Medidas'[Valor_Mensal_Pago_Aditivo]), 1),
+				    ("Saldo Mensal", NAMEOF('Medidas'[Soma_Saldo_Mensal_Aditivo]), 2),
+				    ("Qtd de Pagamentos", NAMEOF('Medidas'[Pagamentos_Aditivo]), 3)
+				}
+
+	annotation PBI_Id = 18b828cbf7e34bb3bc160ec90f1804b0
+

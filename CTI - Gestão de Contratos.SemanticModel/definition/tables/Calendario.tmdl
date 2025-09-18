@@ -1,0 +1,68 @@
+table Calendario
+	lineageTag: c7ebd163-5f3d-493d-8e45-1651172714b6
+
+	column Date
+		formatString: General Date
+		lineageTag: 53606a56-74da-4226-922b-65587a34cc1f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variation
+			isDefault
+			relationship: 2a87e320-d28d-404e-b661-6ad38153e3bf
+			defaultHierarchy: LocalDateTable_fce4d9d1-e36e-4f85-9b27-83d155a98fd3.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ano
+		formatString: 0
+		lineageTag: 0b44be0e-8614-45eb-9e03-b2b5934dfd3e
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Ano]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes
+		formatString: 0
+		lineageTag: ecf367a6-fe52-442b-878a-16aac48c32f5
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Mes]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nome_Mes
+		lineageTag: 2f6df0a9-3bc8-4fa2-b8e6-ac12d6572d5d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Nome_Mes]
+		sortByColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoMes
+		lineageTag: 9dcd04c4-eafb-4338-8215-858c09a7df2b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [AnoMes]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calendario = calculated
+		mode: import
+		source = ```
+				
+				ADDCOLUMNS(
+				    CALENDAR(MIN('5-Contrato'[VIGÊNCIA INICIAL]), MAX('8-Termo Aditivo'[VIGÊNCIA FINAL])),
+				    "Ano", YEAR([Date]),
+				    "Mes", MONTH([Date]),
+				    "Nome_Mes", FORMAT([Date], "MMM"),
+				    "AnoMes", FORMAT([Date], "YYYY-MM")
+				)
+				
+				```
+
+	annotation PBI_Id = fe92dc93a4334443a3d9af788a8cc5dd
+

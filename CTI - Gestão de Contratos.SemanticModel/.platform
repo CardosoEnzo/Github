@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "CTI - Gestão de Contratos"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "625acf92-baad-4a40-af42-8a6f0beb79fc"
+  }
+}

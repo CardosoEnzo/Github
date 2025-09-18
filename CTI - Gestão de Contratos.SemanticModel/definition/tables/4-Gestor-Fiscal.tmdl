@@ -1,0 +1,71 @@
+table 4-Gestor-Fiscal
+	lineageTag: 46d3e0f8-6a47-4ff8-85e0-e8a2112e28f4
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 7dcfcf4c-4aaf-4552-9356-471a17646ec8
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME
+		dataType: string
+		lineageTag: a3c31680-ef83-4efa-92bc-d1a12240b970
+		summarizeBy: none
+		sourceColumn: NOME
+
+		annotation SummarizationSetBy = Automatic
+
+	column CARGO
+		dataType: string
+		lineageTag: 6dbd5034-638f-4f1b-a20a-71bbfd59e517
+		summarizeBy: none
+		sourceColumn: CARGO
+
+		annotation SummarizationSetBy = Automatic
+
+	column TIPO
+		dataType: string
+		lineageTag: 9d8d6fca-65f4-4e01-8cb2-0e75f3a57a8b
+		summarizeBy: none
+		sourceColumn: TIPO
+
+		annotation SummarizationSetBy = Automatic
+
+	column SIGLA_AREA
+		dataType: string
+		lineageTag: 6f47830c-c7b8-4600-9b24-6195fe26f070
+		summarizeBy: none
+		sourceColumn: SIGLA_AREA
+
+		annotation SummarizationSetBy = Automatic
+
+	column LINK_FOTO
+		dataType: string
+		lineageTag: 9705d5ea-37a0-4949-acb5-81585fec7cb9
+		summarizeBy: none
+		sourceColumn: LINK_FOTO
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 4-Gestor-Fiscal = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://prodeboffice365-my.sharepoint.com/personal/cti_saeb_ba_gov_br/Documents/CTI%20-%20Gest%C3%A3o%20de%20Contratos/CTI-%20Gest%C3%A3o%20de%20Contratos.xlsx"), null, true),
+				    #"4-Gestor-Fiscal_Sheet" = Fonte{[Item="4-Gestor-Fiscal",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"4-Gestor-Fiscal_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"LISTA DO GESTOR/FISCAL", type any}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}}),
+				    #"Linhas Superiores Removidas" = Table.Skip(#"Tipo Alterado",2),
+				    #"Cabeçalhos Promovidos1" = Table.PromoteHeaders(#"Linhas Superiores Removidas", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos1",{{"ID", Int64.Type}, {"NOME", type text}, {"CARGO", type text}, {"TIPO", type text}, {"SIGLA_AREA", type text}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado1", each ([NOME] <> null))
+				in
+				    #"Linhas Filtradas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

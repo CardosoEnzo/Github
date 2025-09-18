@@ -1,0 +1,87 @@
+table 2-Empresa
+	lineageTag: f910d7fd-1ed0-4e2b-b40a-4d6c65d77b9b
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 15092261-3c17-426f-8a2e-331825b5ab0c
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME
+		dataType: string
+		lineageTag: 549b254a-11d4-4cc9-a553-f0335bdf5ee0
+		summarizeBy: none
+		sourceColumn: NOME
+
+		annotation SummarizationSetBy = Automatic
+
+	column SIGLA
+		dataType: string
+		lineageTag: 9ac3ee89-3207-406b-9d20-ae4352f617fe
+		summarizeBy: none
+		sourceColumn: SIGLA
+
+		annotation SummarizationSetBy = Automatic
+
+	column CNPJ
+		dataType: string
+		lineageTag: 4aaf4fde-1679-405c-9b1e-a00d4e1eb145
+		summarizeBy: none
+		sourceColumn: CNPJ
+
+		annotation SummarizationSetBy = Automatic
+
+	column ENDEREÇO
+		dataType: string
+		lineageTag: 56b0006a-9693-47f8-873d-1ae116e297ef
+		summarizeBy: none
+		sourceColumn: ENDEREÇO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'MUNICIPIO e UF'
+		dataType: string
+		lineageTag: 75deaaff-4654-45aa-be06-8cb0d8a87495
+		summarizeBy: none
+		sourceColumn: MUNICIPIO e UF
+
+		annotation SummarizationSetBy = Automatic
+
+	column EMAIL
+		dataType: string
+		lineageTag: 99ae82c8-70d7-4c36-817d-f90882e2452f
+		summarizeBy: none
+		sourceColumn: EMAIL
+
+		annotation SummarizationSetBy = Automatic
+
+	column TELEFONE
+		dataType: string
+		lineageTag: 8e77a6e0-4c46-47b5-b811-9495022a372b
+		summarizeBy: none
+		sourceColumn: TELEFONE
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 2-Empresa = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(Web.Contents("https://prodeboffice365-my.sharepoint.com/personal/cti_saeb_ba_gov_br/Documents/CTI%20-%20Gest%C3%A3o%20de%20Contratos/CTI-%20Gest%C3%A3o%20de%20Contratos.xlsx"), null, true),
+				    #"2-Empresa_Sheet" = Fonte{[Item="2-Empresa",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(#"2-Empresa_Sheet", [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"LISTA DA EMPRESA", type any}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"VERIFICAR COLUNAS A SEREM INSERIDAS E MODIFICAÇÃO DA COLUNA ""NOME""", type text}, {"Column6", type text}, {"Column7", type text}, {"Column8", type text}}),
+				    #"Linhas Superiores Removidas" = Table.Skip(#"Tipo Alterado",2),
+				    #"Cabeçalhos Promovidos1" = Table.PromoteHeaders(#"Linhas Superiores Removidas", [PromoteAllScalars=true]),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos1",{{"ID", Int64.Type}, {"NOME", type text}, {"SIGLA", type text}, {"CNPJ", type text}, {"ENDEREÇO", type text}, {"MUNICIPIO e UF", type text}, {"EMAIL", type text}, {"TELEFONE", type text}}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Tipo Alterado1", each ([SIGLA] <> null))
+				in
+				    #"Linhas Filtradas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

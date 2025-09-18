@@ -1,0 +1,24 @@
+table Tabela
+	lineageTag: 943ff163-4f6c-4e42-829e-5bba90937e10
+
+	column Página
+		dataType: string
+		lineageTag: ae90f254-6e55-464a-a301-2a1e924fcb17
+		summarizeBy: none
+		sourceColumn: Página
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Tabela = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WckktSczJSMxNzSvJV0jJL1ZwTMksySzLL1aKjQUA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Página = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"Página", type text}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+
